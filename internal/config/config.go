@@ -8,6 +8,7 @@ import (
 type AppConfig struct {
 	UseCache      bool
 	TemplateCache map[string]*template.Template
-	InfoLog       *log.Logger
 	InProduction  bool
+	InfoLog       *log.Logger
+	ErrorLog      *log.Logger
 }

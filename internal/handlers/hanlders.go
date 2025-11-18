@@ -1,22 +1,28 @@
 package handlers
 
 import (
-	"bank-app/pkg/config"
-	"bank-app/pkg/models"
+	"bank-app/internal/config"
+	"bank-app/internal/driver"
+	"bank-app/internal/models"
+	"bank-app/internal/repository"
+	"bank-app/internal/repository/dbrepo"
 	"bank-app/render"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 var Repo *Repository
 
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
@@ -46,4 +52,20 @@ func (m *Repository) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("the username", r.Form.Get("first_name"))
+
+	user := models.User{
+		FirstName: r.Form.Get("first_name"),
+		LastName:  r.Form.Get("last_name"),
+		Username:  r.Form.Get("username"),
+		Email:     r.Form.Get("username"),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	_, err = m.DB.InsertUser(user)
+	if err != nil {
+		fmt.Println(err)
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

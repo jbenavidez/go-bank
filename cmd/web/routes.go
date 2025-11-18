@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bank-app/pkg/config"
-	"bank-app/pkg/handlers"
+	"bank-app/internal/config"
+	"bank-app/internal/handlers"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"

@@ -1,8 +1,8 @@
 package render
 
 import (
-	"bank-app/pkg/config"
-	"bank-app/pkg/models"
+	"bank-app/internal/config"
+	"bank-app/internal/models"
 	"bytes"
 	"fmt"
 	"html/template"
@@ -20,6 +20,9 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+func NewRenderer(a *config.AppConfig) {
+	app = a
+}
 func AddDefaultData(td *models.TemplateData) *models.TemplateData {
 
 	return td
