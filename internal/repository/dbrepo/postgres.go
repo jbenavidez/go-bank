@@ -9,9 +9,41 @@ import (
 
 const dbTimeout = time.Second * 3
 
-func (m *postgresDBRepo) AllUsers() bool {
-	return true
+func (m *postgresDBRepo) AllCustomers() ([]*models.User, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `
+		select
+			id, first_name, last_name, email, username
+		from
+			users
+	`
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var customerList []*models.User
+
+	for rows.Next() {
+		var customer models.User
+		err := rows.Scan(
+			&customer.ID,
+			&customer.FirstName,
+			&customer.LastName,
+			&customer.Email,
+			&customer.Username,
+		)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		customerList = append(customerList, &customer)
+	}
+	return customerList, nil
 }
 
 func (m *postgresDBRepo) InsertUser(user models.User) (int, error) {

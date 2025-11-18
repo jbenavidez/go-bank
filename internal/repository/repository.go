@@ -3,6 +3,6 @@ package repository
 import "bank-app/internal/models"
 
 type DatabaseRepo interface {
-	AllUsers() bool
+	AllCustomers() ([]*models.User, error)
 	InsertUser(user models.User) (int, error)
 }

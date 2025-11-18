@@ -33,7 +33,18 @@ func NewHandlers(r *Repository) {
 // Customers is the handler for the customers page
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
-	render.RenderTemplate(w, "customers.page.tmpl", &models.TemplateData{})
+	customers, err := m.DB.AllCustomers()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("the customer", customers)
+	data := make(map[string]any)
+	data["customers"] = customers
+
+	render.RenderTemplate(w, "customers.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
 }
 
 // AddCustomer is the handler for the Customer add form page
