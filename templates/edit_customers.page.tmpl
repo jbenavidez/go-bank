@@ -6,28 +6,28 @@
         <h4 class="card-title mb-0">Edit  Customer</h4>
     </div>
     <div class="card-body">
+     
+           {{$res := index .Data "customer"}}
         <div class="container">
-            <form  action="/customers/create" method="post">
+            <form  action="/customers/{{$res.ID}}" method="post">
                 <div class="mb-3">
-                    <label for="first_name" class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="first_name" name="first_name" required >
+                    <label for="first_name" class="form-label">First Name </label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" required value="{{$res.FirstName}}">
                 </div>
                 <div class="mb-3">
                     <label for="last_name" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="last_name" name="last_name" required>
+                    <input type="text" class="form-control" id="last_name" name="last_name" required value="{{$res.LastName}}">
                 </div>
 
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username"   name="username"  required>
+                    <input type="text" class="form-control" id="username"   name="username"  required value="{{$res.Email}}">
                 </div>
 
                 <div class="mb-3">
                     <label for="email_address" class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="email_address"  name="email_address"  required>
+                    <input type="email" class="form-control" id="email_address"  name="email_address"  required value="{{$res.Username}}">
                 </div>
-
-
                 <button type="submit" class="btn btn-primary">Save</button>
             </form>
         </div>

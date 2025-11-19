@@ -81,7 +81,7 @@ func (m *postgresDBRepo) Getuser(userID int) (*models.User, error) {
 	defer cancel()
 	query := `
 		select
-			first_name, last_name, email, username
+			id, first_name, last_name, email, username
 		from
 			users
 		where id = $1
@@ -89,6 +89,7 @@ func (m *postgresDBRepo) Getuser(userID int) (*models.User, error) {
 	row := m.DB.QueryRowContext(ctx, query, userID)
 	var user models.User
 	err := row.Scan(
+		&user.ID,
 		&user.FirstName,
 		&user.LastName,
 		&user.Email,
@@ -100,5 +101,31 @@ func (m *postgresDBRepo) Getuser(userID int) (*models.User, error) {
 	}
 
 	return &user, nil
+
+}
+
+func (m *postgresDBRepo) UpdateUser(userID int, userObj models.User) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `
+		update users set first_name=$1, last_name=$2 , email = $3, username = $4, updated_at = $5
+		where id = $6
+	`
+	_, err := m.DB.ExecContext(ctx, stmt,
+		userObj.FirstName,
+		userObj.LastName,
+		userObj.Email,
+		userObj.Username,
+		userObj.UpdatedAt,
+		userID,
+	)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
 
 }

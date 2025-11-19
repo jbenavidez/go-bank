@@ -84,7 +84,7 @@ func (m *Repository) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-// CreateCustomer is the handler for creating a customer record when the user submit the form
+// EditCustomer is the handler for displaying  the edit form
 func (m *Repository) EditCustomer(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := strconv.Atoi(chi.URLParam(r, "id"))
@@ -92,6 +92,7 @@ func (m *Repository) EditCustomer(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
+
 	user, err := m.DB.Getuser(userID)
 	if err != nil {
 		fmt.Println(err)
@@ -102,4 +103,34 @@ func (m *Repository) EditCustomer(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "edit_customers.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
+}
+
+// UpdateCustomer is the handler for updating customer re
+func (m *Repository) UpdateCustomer(w http.ResponseWriter, r *http.Request) {
+
+	userID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = r.ParseForm()
+
+	if err != nil {
+		fmt.Println("something break getting the form")
+		return
+	}
+	user := models.User{
+		FirstName: r.Form.Get("first_name"),
+		LastName:  r.Form.Get("last_name"),
+		Username:  r.Form.Get("username"),
+		Email:     r.Form.Get("email_address"),
+		UpdatedAt: time.Now(),
+	}
+	// update user
+	err = m.DB.UpdateUser(userID, user)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
