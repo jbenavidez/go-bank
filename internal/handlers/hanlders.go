@@ -9,7 +9,10 @@ import (
 	"bank-app/render"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/go-chi/chi/v5"
 )
 
 var Repo *Repository
@@ -79,4 +82,24 @@ func (m *Repository) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// CreateCustomer is the handler for creating a customer record when the user submit the form
+func (m *Repository) EditCustomer(w http.ResponseWriter, r *http.Request) {
+
+	userID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	user, err := m.DB.Getuser(userID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	data := make(map[string]any)
+	data["customer"] = user
+	render.RenderTemplate(w, "edit_customers.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
 }

@@ -74,3 +74,31 @@ func (m *postgresDBRepo) InsertUser(user models.User) (int, error) {
 	return newID, nil
 
 }
+
+func (m *postgresDBRepo) Getuser(userID int) (*models.User, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+	query := `
+		select
+			first_name, last_name, email, username
+		from
+			users
+		where id = $1
+	`
+	row := m.DB.QueryRowContext(ctx, query, userID)
+	var user models.User
+	err := row.Scan(
+		&user.FirstName,
+		&user.LastName,
+		&user.Email,
+		&user.Username,
+	)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return &user, nil
+
+}
