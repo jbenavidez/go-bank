@@ -21,6 +21,7 @@ func routes(app *config.AppConfig) http.Handler {
 
 	mux.Get("/customers/{id}", handlers.Repo.EditCustomer)
 	mux.Post("/customers/{id}", handlers.Repo.UpdateCustomer)
+	mux.Delete("/customers/delete/{id}", handlers.Repo.DeleteCustomer)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

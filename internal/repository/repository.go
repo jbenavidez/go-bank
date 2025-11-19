@@ -7,4 +7,5 @@ type DatabaseRepo interface {
 	InsertUser(user models.User) (int, error)
 	Getuser(userID int) (*models.User, error)
 	UpdateUser(userID int, userObj models.User) error
+	DeleteUser(userID int) error
 }

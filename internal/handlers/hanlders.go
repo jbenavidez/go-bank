@@ -7,6 +7,7 @@ import (
 	"bank-app/internal/repository"
 	"bank-app/internal/repository/dbrepo"
 	"bank-app/render"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -41,7 +42,6 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("the customer", customers)
 	data := make(map[string]any)
 	data["customers"] = customers
 
@@ -133,4 +133,50 @@ func (m *Repository) UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// DeleteCustomer is the handler for deleting a customer record
+func (m *Repository) DeleteCustomer(w http.ResponseWriter, r *http.Request) {
+
+	userID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	//delete user
+	err = m.DB.DeleteUser(userID)
+	if err != nil {
+		fmt.Println(err)
+		// return bad equest
+		_ = m.WriteResponse(w, false, "unable to deleted the user", http.StatusBadRequest)
+		return
+	}
+	//set response
+	_ = m.WriteResponse(w, false, "user deleted", http.StatusOK)
+
+}
+
+func (m *Repository) WriteResponse(w http.ResponseWriter, errStatus bool, message string, status int) error {
+	//set response
+	resp := JSONResponse{
+		Error:   errStatus,
+		Message: message,
+	}
+
+	out, err := json.Marshal(resp)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	//write header
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	//write response
+	_, err = w.Write(out)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -13,7 +13,6 @@ func (m *postgresDBRepo) AllCustomers() ([]*models.User, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
-
 	query := `
 		select
 			id, first_name, last_name, email, username
@@ -119,6 +118,27 @@ func (m *postgresDBRepo) UpdateUser(userID int, userObj models.User) error {
 		userObj.Email,
 		userObj.Username,
 		userObj.UpdatedAt,
+		userID,
+	)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
+
+}
+
+func (m *postgresDBRepo) DeleteUser(userID int) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `
+		Delete From users
+		where id = $1
+	`
+	_, err := m.DB.ExecContext(ctx, stmt,
 		userID,
 	)
 	if err != nil {

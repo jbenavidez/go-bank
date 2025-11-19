@@ -29,9 +29,9 @@
                                                 <td>{{.Username}} </td>
                                                 <td>
                                                 <div class="btn-group" role="group" aria-label="Basic outlined example">
-                                                    <a   class="btn btn-outline-primary">View</a>
+                                                    <a class="btn btn-outline-primary">View</a>
                                                     <a href= "/customers/{{.ID}}" class="btn btn-outline-primary">Edit</a>
-                                                    <a   class="btn btn-outline-danger">Delete</a>
+                                                    <button onclick="DeleteUser({{.ID}})" class="btn btn-outline-danger">Delete</button>
                                                     </div>     
                                                 </td>
                                             
@@ -41,4 +41,34 @@
                                 </table>
                             </div>
                         </div>
+{{end}}
+
+{{define "js"}}
+
+<script>
+  function DeleteUser(userID) {
+  
+  var endpoint = "/customers/delete/" + userID
+  console.log("the endpoint", userID)
+  fetch(endpoint,{
+      method: 'DELETE',
+    })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('something went wrng');
+    }
+    return response.json();  
+  })
+  .then(data => {
+    console.log('user deleted');  
+    window.location.reload(); //reload
+ 
+  })
+  .catch(error => {
+    console.error('Error delete user:', error) 
+  });
+
+  }
+</script>
+
 {{end}}
