@@ -3,6 +3,8 @@ package config
 import (
 	"html/template"
 	"log"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 type AppConfig struct {
@@ -11,4 +13,5 @@ type AppConfig struct {
 	InProduction  bool
 	InfoLog       *log.Logger
 	ErrorLog      *log.Logger
+	Session       *scs.SessionManager
 }

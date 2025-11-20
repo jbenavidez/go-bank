@@ -5,22 +5,25 @@ import (
 	"bank-app/internal/driver"
 	"bank-app/internal/handlers"
 	"bank-app/internal/helpers"
+	"bank-app/internal/models"
 	"bank-app/render"
+	"encoding/gob"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"time"
+
+	"github.com/alexedwards/scs/v2"
 )
 
 const port = ":8080"
 
 var app config.AppConfig
-
-// logger
-var infoLog *log.Logger
-var errorLog *log.Logger
+var sessionManager *scs.SessionManager
 
 func main() {
+	//  data that is going to session
+	//gob.Register(models.User{})
 
 	db, err := run()
 	if err != nil {
@@ -40,22 +43,23 @@ func main() {
 }
 
 func run() (*driver.DB, error) {
-	//
-
-	app.InProduction = false
-
-	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	app.InfoLog = infoLog
-
-	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-	app.ErrorLog = errorLog
-	// connect to database
+	gob.Register(models.User{})
+	// set session
+	sessionManager = scs.New()
+	sessionManager.Lifetime = 24 * time.Hour
+	sessionManager.Cookie.Persist = true
+	sessionManager.Cookie.SameSite = http.SameSiteLaxMode
+	sessionManager.Cookie.Secure = app.InProduction
+	//add session to app
+	app.Session = sessionManager
+	// setdb
 	log.Println("Connecting to database...")
 	db, err := driver.ConnectSQL("host=localhost port=5432 user=postgres password=postgres dbname=bank sslmode=disable timezone=UTC connect_timeout=5")
 	if err != nil {
-		log.Fatal("Cannot connect to database!")
+		log.Fatal("unable to connect to database!")
 	}
 	log.Println("Connected to database!")
+
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 	render.NewRenderer(&app)

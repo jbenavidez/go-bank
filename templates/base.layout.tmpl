@@ -56,6 +56,25 @@
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item active"></li>
                         </ol>
+
+                           {{with .Error}}
+                      <div class="alert alert-danger" role="alert">
+                          {{.}}
+                            </div>
+                        {{end}}
+
+                        {{with .Flash}}
+                     <div class="alert alert-primary" role="alert">
+                      {{.}}
+                        </div>
+                        {{end}}
+
+                        {{with .Warning}}
+                      
+                        <div class="alert alert-primary" role="alert">
+                      {{.}}
+                        </div>
+                        {{end}}
                        {{block "content" .}}
 
                             {{end}}

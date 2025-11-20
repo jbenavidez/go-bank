@@ -3,6 +3,7 @@ package handlers
 import (
 	"bank-app/internal/config"
 	"bank-app/internal/driver"
+	"bank-app/internal/forms"
 	"bank-app/internal/models"
 	"bank-app/internal/repository"
 	"bank-app/internal/repository/dbrepo"
@@ -45,7 +46,7 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]any)
 	data["customers"] = customers
 
-	render.RenderTemplate(w, "customers.page.tmpl", &models.TemplateData{
+	render.RenderTemplate(w, r, "customers.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
 }
@@ -53,7 +54,11 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 // AddCustomer is the handler for the Customer add form page
 func (m *Repository) AddCustomer(w http.ResponseWriter, r *http.Request) {
 
-	render.RenderTemplate(w, "add_customer.page.tmpl", &models.TemplateData{})
+	data := make(map[string]any)
+	render.RenderTemplate(w, r, "add_customer.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
+		Data: data,
+	})
 }
 
 // CreateCustomer is the handler for creating a customer record when the user submit the form
@@ -65,15 +70,30 @@ func (m *Repository) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("something break getting the form")
 		return
 	}
-	fmt.Println("the username", r.Form.Get("first_name"))
-
+	// sert user
 	user := models.User{
 		FirstName: r.Form.Get("first_name"),
 		LastName:  r.Form.Get("last_name"),
 		Username:  r.Form.Get("username"),
-		Email:     r.Form.Get("username"),
+		Email:     r.Form.Get("email_address"),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
+	}
+	// validate form
+	form := forms.New(r.PostForm)
+	form.Required("first_name", "last_name", "email_address", "username")
+	form.MinLength("first_name", 1)
+	form.IsEmail("email_address")
+	form.MinLength("username", 1)
+	if !form.Valid() {
+		data := make(map[string]any)
+		data["user"] = user
+		render.RenderTemplate(w, r, "add_customer.page.tmpl", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+		return
+
 	}
 	_, err = m.DB.InsertUser(user)
 	if err != nil {
@@ -81,6 +101,8 @@ func (m *Repository) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
+	// add flash message before redirect
+	m.App.Session.Put(r.Context(), "flash", "user was created succefully")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -100,7 +122,7 @@ func (m *Repository) EditCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 	data := make(map[string]any)
 	data["customer"] = user
-	render.RenderTemplate(w, "edit_customers.page.tmpl", &models.TemplateData{
+	render.RenderTemplate(w, r, "edit_customers.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
 }
