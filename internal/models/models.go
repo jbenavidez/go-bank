@@ -13,9 +13,10 @@ type User struct {
 }
 
 type Account struct {
-	ID        int     `json:"id"`
-	UserID    int     `json:"user_id"`
-	Amount    float64 `json:"amount"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID          int     `json:"id"`
+	AccountType string  `json:"account_type"`
+	Amount      float64 `json:"amount"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	User        User
 }

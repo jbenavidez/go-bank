@@ -8,11 +8,11 @@
     <div class="card-body">
         <div class="container">
             {{$customers := index .Data "customers"}}
-            <form action="/account/create" method="post">
+            <form action="/accounts/create" method="post">
                 <div class="form-group" style="margin-bottom:10px;">
                     <label for="user_id">Customer:</label>
-                    <select class="form-select" id="user_id" name="user_id">
-                        <option  >---Select Customer---</option>
+                    <select class="form-select" id="user_id" name="user_id"required>
+                        <option  ></option>
                          {{range $customers}}
                         <option value="{{.ID}}">{{.FirstName}} {{.LastName}}</option>
                           {{end}}
@@ -20,9 +20,9 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom:10px;">
-                    <label for="acc_type">Type:</label>
-                    <select class="form-select" id="acc_type"  name="acc_type" >
-                      <option  >---Select Account Type---</option>
+                    <label for="account_type">Account Type:</label>
+                    <select class="form-select" id="account_type"  name="account_type" required>
+                      <option  ></option>
                         <option value="checking">Checking</option>
                         <option value="checking">Saving</option>
                    

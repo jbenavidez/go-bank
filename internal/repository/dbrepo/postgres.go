@@ -149,3 +149,75 @@ func (m *postgresDBRepo) DeleteUser(userID int) error {
 	return nil
 
 }
+
+func (m *postgresDBRepo) CreateAccount(account models.Account) (int, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+	stmt := `
+		insert into accounts
+			(account_type, amount, user_id, created_at, updated_at)
+		values	
+			($1,$2,$3,$4,$5) 
+		returning id
+	`
+
+	var newID int
+
+	err := m.DB.QueryRowContext(ctx, stmt,
+		account.AccountType,
+		account.Amount,
+		account.User.ID,
+		account.CreatedAt,
+		account.CreatedAt,
+	).Scan(&newID)
+
+	if err != nil {
+		fmt.Println("err creating account", err)
+		return 0, err
+	}
+	return newID, nil
+
+}
+
+func (m *postgresDBRepo) AllAccounts() ([]*models.Account, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+	query := `
+		select
+			accounts.id, accounts.account_type , accounts.amount, accounts.created_at, accounts.updated_at, users.id, users.first_name, users.last_name 
+		from
+			accounts
+		inner join
+			users ON accounts.user_id = users.id
+
+	`
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var accounts []*models.Account
+
+	for rows.Next() {
+		var account models.Account
+		err := rows.Scan(
+			&account.ID,
+			&account.AccountType,
+			&account.Amount,
+			&account.CreatedAt,
+			&account.UpdatedAt,
+			&account.User.ID,
+			&account.User.FirstName,
+			&account.User.LastName,
+		)
+		if err != nil {
+			fmt.Println("error getting accounts", err)
+			return nil, err
+		}
+		accounts = append(accounts, &account)
+	}
+	return accounts, nil
+}

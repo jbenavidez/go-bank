@@ -8,4 +8,6 @@ type DatabaseRepo interface {
 	Getuser(userID int) (*models.User, error)
 	UpdateUser(userID int, userObj models.User) error
 	DeleteUser(userID int) error
+	CreateAccount(account models.Account) (int, error)
+	AllAccounts() ([]*models.Account, error)
 }

@@ -79,6 +79,63 @@ func (m *Repository) OpenAccount(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// CreateAccount is the handler fo creating the account on our db
+func (m *Repository) CreateAccount(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+
+	if err != nil {
+		fmt.Println("something break getting the form")
+		m.App.Session.Put(r.Context(), "error", "unable to pull customer list")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	userID, err := strconv.Atoi(r.Form.Get("user_id"))
+	if err != nil {
+		fmt.Println(err)
+		m.App.Session.Put(r.Context(), "error", "unable to convert userID")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+	amount, err := strconv.ParseFloat(r.Form.Get("amount"), 64)
+	if err != nil {
+		fmt.Println(err)
+		m.App.Session.Put(r.Context(), "error", "unable to parse string")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	}
+	//set account
+	account := models.Account{
+		User:        models.User{ID: userID},
+		AccountType: r.Form.Get("account_type"),
+		Amount:      amount,
+	}
+	// validate form
+	form := forms.New(r.PostForm)
+	form.Required("user_id", "account_type", "amount")
+	if !form.Valid() {
+		data := make(map[string]any)
+		data["account"] = account
+		render.RenderTemplate(w, r, "add_account.page.tmpl", &models.TemplateData{
+			Form: form,
+			Data: data,
+		})
+		return
+
+	}
+	//create account
+	account.CreatedAt = time.Now()
+	account.UpdatedAt = time.Now()
+	_, err = m.DB.CreateAccount(account)
+	if err != nil {
+		fmt.Println(err)
+		m.App.Session.Put(r.Context(), "error", err.Error())
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	}
+	// set flash messagew
+	m.App.Session.Put(r.Context(), "flash", "Account was created succefully")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
 // CreateCustomer is the handler for creating a customer record when the user submit the form
 func (m *Repository) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 
@@ -88,7 +145,7 @@ func (m *Repository) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("something break getting the form")
 		return
 	}
-	// sert user
+	// set user
 	user := models.User{
 		FirstName: r.Form.Get("first_name"),
 		LastName:  r.Form.Get("last_name"),
@@ -219,4 +276,19 @@ func (m *Repository) WriteResponse(w http.ResponseWriter, errStatus bool, messag
 		return err
 	}
 	return nil
+}
+
+func (m *Repository) Accounts(w http.ResponseWriter, r *http.Request) {
+
+	accounts, err := m.DB.AllAccounts()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	data := make(map[string]any)
+	data["accounts"] = accounts
+
+	render.RenderTemplate(w, r, "accounts.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
 }
