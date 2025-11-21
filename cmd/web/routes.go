@@ -16,14 +16,15 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Use(SessionLoadAndSave) //middleware to use session
 
 	mux.Get("/", handlers.Repo.Home)
-
+	// customers
 	mux.Get("/customers/add", handlers.Repo.AddCustomer)
 	mux.Post("/customers/create", handlers.Repo.CreateCustomer)
-
 	mux.Get("/customers/{id}", handlers.Repo.EditCustomer)
 	mux.Post("/customers/{id}", handlers.Repo.UpdateCustomer)
 	mux.Delete("/customers/delete/{id}", handlers.Repo.DeleteCustomer)
-
+	//accounts
+	mux.Get("/account/create", handlers.Repo.OpenAccount)
+	//
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 	return mux

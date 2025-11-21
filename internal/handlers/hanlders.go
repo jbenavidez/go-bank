@@ -61,6 +61,24 @@ func (m *Repository) AddCustomer(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// OpenAccount is the handler for the Open account page
+func (m *Repository) OpenAccount(w http.ResponseWriter, r *http.Request) {
+
+	//get customers
+	customers, err := m.DB.AllCustomers()
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "unable to pull customer list")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	}
+
+	data := make(map[string]any)
+	data["customers"] = customers
+	render.RenderTemplate(w, r, "add_account.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
+		Data: data,
+	})
+}
+
 // CreateCustomer is the handler for creating a customer record when the user submit the form
 func (m *Repository) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 

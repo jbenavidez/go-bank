@@ -9,7 +9,7 @@
         <div class="container">
          {{$userObj := index .Data "user"}}
             <form  action="/customers/create" method="post">
-                <div class="mb-3">
+                <div class="form-group">
                     <label for="first_name" class="form-label">First Name 
                     </label>
                     <input type="text" class="form-control" id="first_name" name="first_name" required  value="{{$userObj.FirstName}}">
@@ -17,7 +17,7 @@
                                 <small id="emailHelp" class="form-text text-danger">{{.}}</small>
                         {{end}}
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label for="last_name" class="form-label">Last Name</label>
                     <input type="text" class="form-control" id="last_name" name="last_name" required value="{{$userObj.LastName}}">
                         {{with .Form.Errors.Get "last_name"}}
@@ -25,7 +25,7 @@
                         {{end}}
                 </div>
 
-                <div class="mb-3">
+                <div class="form-group">
                     <label for="username" class="form-label">Username</label>
                     <input type="text" class="form-control" id="username"   name="username"  required value="{{$userObj.Username}}">
                         {{with .Form.Errors.Get "username"}}
