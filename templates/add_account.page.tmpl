@@ -10,9 +10,9 @@
             {{$customers := index .Data "customers"}}
             <form action="/account/create" method="post">
                 <div class="form-group" style="margin-bottom:10px;">
-                    <label for="customer">Customer:</label>
-                    <select class="form-select" id="customer" name="customer">
-                        <option  >---Select Cutomer---</option>
+                    <label for="user_id">Customer:</label>
+                    <select class="form-select" id="user_id" name="user_id">
+                        <option  >---Select Customer---</option>
                          {{range $customers}}
                         <option value="{{.ID}}">{{.FirstName}} {{.LastName}}</option>
                           {{end}}
@@ -22,10 +22,10 @@
                 <div class="form-group" style="margin-bottom:10px;">
                     <label for="acc_type">Type:</label>
                     <select class="form-select" id="acc_type"  name="acc_type" >
-                      <option  >---Select Cutomer---</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                      <option  >---Select Account Type---</option>
+                        <option value="checking">Checking</option>
+                        <option value="checking">Saving</option>
+                   
                     </select>
 
                     <div class="form-group" style="margin-bottom:10px;">
