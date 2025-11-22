@@ -186,7 +186,7 @@ func (m *postgresDBRepo) AllAccounts() ([]*models.Account, error) {
 	defer cancel()
 	query := `
 		select
-			accounts.id, accounts.account_type , accounts.amount, accounts.created_at, accounts.updated_at, users.id, users.first_name, users.last_name 
+			accounts.id, accounts.account_type,  accounts.account_status , accounts.amount, accounts.created_at, accounts.updated_at, users.id, users.first_name, users.last_name 
 		from
 			accounts
 		inner join
@@ -206,6 +206,7 @@ func (m *postgresDBRepo) AllAccounts() ([]*models.Account, error) {
 		err := rows.Scan(
 			&account.ID,
 			&account.AccountType,
+			&account.AccountStatus,
 			&account.Amount,
 			&account.CreatedAt,
 			&account.UpdatedAt,
@@ -228,7 +229,7 @@ func (m *postgresDBRepo) AllAccountsByUserID(userId int) ([]*models.Account, err
 	defer cancel()
 	query := `
 		select
-			accounts.id, accounts.account_type , accounts.amount, accounts.created_at, accounts.updated_at, users.id, users.first_name, users.last_name 
+			accounts.id, accounts.account_type, accounts.account_status , accounts.amount, accounts.created_at, accounts.updated_at, users.id, users.first_name, users.last_name 
 		from
 			accounts
 		inner join
@@ -251,6 +252,7 @@ func (m *postgresDBRepo) AllAccountsByUserID(userId int) ([]*models.Account, err
 		err := rows.Scan(
 			&account.ID,
 			&account.AccountType,
+			&account.AccountStatus,
 			&account.Amount,
 			&account.CreatedAt,
 			&account.UpdatedAt,
@@ -273,7 +275,7 @@ func (m *postgresDBRepo) GetAccount(accountId int) (*models.Account, error) {
 	defer cancel()
 	query := `
 		select
-			id, account_type, amount, created_at, updated_at
+			id, account_type, amount, created_at, updated_at, account_status
 		from
 			accounts
 		where id = $1
@@ -286,11 +288,35 @@ func (m *postgresDBRepo) GetAccount(accountId int) (*models.Account, error) {
 		&account.Amount,
 		&account.CreatedAt,
 		&account.UpdatedAt,
+		&account.AccountStatus,
 	)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 	return &account, nil
+
+}
+
+func (m *postgresDBRepo) UpdateAccount(accountID int, account models.Account) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `
+		update accounts set account_type=$1, account_status=$2
+		where id = $3
+	`
+	_, err := m.DB.ExecContext(ctx, stmt,
+		account.AccountType,
+		account.AccountStatus,
+		accountID,
+	)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
 
 }

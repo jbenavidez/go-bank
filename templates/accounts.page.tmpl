@@ -14,6 +14,7 @@
                                             <th>First Name</th>
                                             <th>Last Name</th>
                                             <th>Account Type</th>
+                                             <th>Account Status</th>
                                             <th>Balance</th>
                                          
                                             <th>Actions</th>
@@ -29,12 +30,13 @@
                                         <td>{{.User.FirstName}}</td>
                                         <td>{{.User.LastName}}</td>
                                         <td>{{.AccountType}}</td>
+                                         <td>{{.AccountStatus}}</td>
                                         <td>{{.Amount}}</td>
                                         <td>
                                         <div class="btn-group" role="group" aria-label="Basic outlined example">
-                                            <a class="btn btn-outline-primary">View</a>
-                                            <a href= "/account/{{.ID}}" class="btn btn-outline-primary">Edit</a>
-                                            <button onclick="" class="btn btn-outline-danger">Delete</button>
+                                            <a  href="/accounts/view/{{.ID}}" class="btn btn-outline-primary">View</a>
+                                            <a href= "/accounts/edit/{{.ID}}" class="btn btn-outline-primary">Edit</a>
+                                
                                             </div>     
                                         </td>
                                             

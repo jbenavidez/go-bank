@@ -12,4 +12,5 @@ type DatabaseRepo interface {
 	AllAccounts() ([]*models.Account, error)
 	AllAccountsByUserID(userId int) ([]*models.Account, error)
 	GetAccount(accountId int) (*models.Account, error)
+	UpdateAccount(accountID int, account models.Account) error
 }

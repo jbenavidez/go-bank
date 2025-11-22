@@ -1,0 +1,35 @@
+{{template "base" .}}
+
+{{define "content"}}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0">Edit  Account</h4>
+    </div>
+    <div class="card-body">
+        <div class="container">
+            {{$res := index .Data "account"}}
+            <form action="/accounts/edit/{{$res.ID}}"  method="post">
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label for="account_type">Account Type: </label>
+                    <select class="form-select" id="account_type" name="account_type" required>
+                        <option value="checking"  {{if eq $res.AccountType "checking"}}selected{{end}}  >Checking</option>
+                        <option value="saving" {{if eq $res.AccountType "saving"}}selected{{end}}  >Saving</option>
+
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom:10px;">
+                    <label for="account_status">Account Status:</label>
+                    <select class="form-select" id="account_status" name="account_status" required>
+                        <option value="active" {{if eq $res.AccountStatus "active"}}selected{{end}} >Active</option>
+                        <option value="close" {{if eq $res.AccountStatus "close"}}selected{{end}} >Close</option>
+
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+{{end}}

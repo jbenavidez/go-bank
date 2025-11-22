@@ -131,9 +131,9 @@ func (m *Repository) CreateAccount(w http.ResponseWriter, r *http.Request) {
 		m.App.Session.Put(r.Context(), "error", err.Error())
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 	}
-	// set flash messagew
+	// set flash message
 	m.App.Session.Put(r.Context(), "flash", "Account was created succefully")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/accounts", http.StatusSeeOther)
 }
 
 // CreateCustomer is the handler for creating a customer record when the user submit the form
@@ -321,6 +321,7 @@ func (m *Repository) Accounts(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// ViewAccount is the handler for view account page
 func (m *Repository) ViewAccount(w http.ResponseWriter, r *http.Request) {
 
 	accountID, err := strconv.Atoi(chi.URLParam(r, "id"))
@@ -342,4 +343,59 @@ func (m *Repository) ViewAccount(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "view_account.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
+}
+
+// EditAccount is the handler for edit account page
+func (m *Repository) EditAccount(w http.ResponseWriter, r *http.Request) {
+
+	accountID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// get account
+	account, err := m.DB.GetAccount(accountID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//set map
+	data := make(map[string]any)
+
+	data["account"] = account
+	render.RenderTemplate(w, r, "edit_account.page.tmpl", &models.TemplateData{
+		Data: data,
+		Form: forms.New(nil),
+	})
+}
+
+// UpdateAccount is the handler for updating account record
+func (m *Repository) UpdateAccount(w http.ResponseWriter, r *http.Request) {
+
+	accountID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("here john", accountID)
+	err = r.ParseForm()
+
+	if err != nil {
+		fmt.Println("something break getting the form")
+		return
+	}
+	var account models.Account
+	account.AccountType = r.Form.Get("account_type")
+	account.AccountStatus = r.Form.Get("account_status")
+	account.UpdatedAt = time.Now()
+	err = m.DB.UpdateAccount(accountID, account)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("updated completed")
+	m.App.Session.Put(r.Context(), "flash", "Account was updated succefully")
+	http.Redirect(w, r, "/accounts", http.StatusSeeOther)
+
 }
