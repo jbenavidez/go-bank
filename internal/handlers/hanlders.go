@@ -202,6 +202,34 @@ func (m *Repository) EditCustomer(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (m *Repository) ViewCustomer(w http.ResponseWriter, r *http.Request) {
+
+	userID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// get user
+	user, err := m.DB.Getuser(userID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// get accounts
+	accounts, err := m.DB.AllAccountsByUserID(userID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//set map
+	data := make(map[string]any)
+	data["customer"] = user // we could get user info from the accounts | this query is optional
+	data["accounts"] = accounts
+	render.RenderTemplate(w, r, "view_customers.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
+}
+
 // UpdateCustomer is the handler for updating customer re
 func (m *Repository) UpdateCustomer(w http.ResponseWriter, r *http.Request) {
 

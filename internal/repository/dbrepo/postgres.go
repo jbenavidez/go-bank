@@ -221,3 +221,48 @@ func (m *postgresDBRepo) AllAccounts() ([]*models.Account, error) {
 	}
 	return accounts, nil
 }
+
+func (m *postgresDBRepo) AllAccountsByUserID(userId int) ([]*models.Account, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+	query := `
+		select
+			accounts.id, accounts.account_type , accounts.amount, accounts.created_at, accounts.updated_at, users.id, users.first_name, users.last_name 
+		from
+			accounts
+		inner join
+			users ON accounts.user_id = users.id
+		where 
+			 accounts.user_id = $1
+	`
+	rows, err := m.DB.QueryContext(ctx, query,
+		userId,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var accounts []*models.Account
+
+	for rows.Next() {
+		var account models.Account
+		err := rows.Scan(
+			&account.ID,
+			&account.AccountType,
+			&account.Amount,
+			&account.CreatedAt,
+			&account.UpdatedAt,
+			&account.User.ID,
+			&account.User.FirstName,
+			&account.User.LastName,
+		)
+		if err != nil {
+			fmt.Println("error getting accounts", err)
+			return nil, err
+		}
+		accounts = append(accounts, &account)
+	}
+	return accounts, nil
+}

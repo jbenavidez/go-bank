@@ -22,6 +22,7 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/customers/{id}", handlers.Repo.EditCustomer)
 	mux.Post("/customers/{id}", handlers.Repo.UpdateCustomer)
 	mux.Delete("/customers/delete/{id}", handlers.Repo.DeleteCustomer)
+	mux.Get("/customers/view/{id}", handlers.Repo.ViewCustomer)
 	//accounts
 	mux.Get("/accounts", handlers.Repo.Accounts)
 	mux.Get("/accounts/create", handlers.Repo.OpenAccount)

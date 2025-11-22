@@ -10,4 +10,5 @@ type DatabaseRepo interface {
 	DeleteUser(userID int) error
 	CreateAccount(account models.Account) (int, error)
 	AllAccounts() ([]*models.Account, error)
+	AllAccountsByUserID(userId int) ([]*models.Account, error)
 }
