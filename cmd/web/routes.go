@@ -27,7 +27,7 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/accounts", handlers.Repo.Accounts)
 	mux.Get("/accounts/create", handlers.Repo.OpenAccount)
 	mux.Post("/accounts/create", handlers.Repo.CreateAccount)
-
+	mux.Get("/accounts/view/{id}", handlers.Repo.ViewAccount)
 	//
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))

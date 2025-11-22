@@ -320,3 +320,26 @@ func (m *Repository) Accounts(w http.ResponseWriter, r *http.Request) {
 		Data: data,
 	})
 }
+
+func (m *Repository) ViewAccount(w http.ResponseWriter, r *http.Request) {
+
+	accountID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// get accounts
+	account, err := m.DB.GetAccount(accountID)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	//set map
+	data := make(map[string]any)
+
+	data["account"] = account
+	render.RenderTemplate(w, r, "view_account.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
+}

@@ -1,0 +1,28 @@
+{{template "base" .}}
+
+{{define "content"}}
+<div class="container">
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Account Details</h4>
+               <a class="btn btn-primary btn-sm" href="/customers/add">New Transaction</a >
+        </div>
+        <div class="card-body">
+
+            <div class="container">
+                    {{$res := index .Data "account"}}
+                <dl class="row">
+                    <dt class="col-sm-3">Account Type :</dt>
+                    <dd class="col-sm-9">{{$res.AccountType}}</dd>
+                    <dt class="col-sm-3">Balance:</dt>
+                    <dd class="col-sm-9">{{$res.Amount}}</dd>
+                    <dt class="col-sm-3">Updated At:</dt>
+                    <dd class="col-sm-9">{{$res.UpdatedAt}}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+ 
+</div>
+
+{{end}}
